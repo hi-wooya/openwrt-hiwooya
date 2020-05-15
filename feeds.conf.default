@@ -1,4 +1,4 @@
-src-git packages https://github.com/hi-wooya/packages.git;hiwooya_dlna_patches
+src-git packages https://github.com/hi-wooya/packages.git;master
 src-git luci https://github.com/hi-wooya/luci.git;master
 src-git routing https://github.com/openwrt-routing/packages.git;for-15.05
 src-git telephony https://github.com/openwrt/telephony.git;for-15.05
