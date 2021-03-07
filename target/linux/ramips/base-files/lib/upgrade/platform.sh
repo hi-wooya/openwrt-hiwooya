@@ -122,6 +122,7 @@ platform_check_image() {
 	wr6202 |\
 	wr8305rt |\
 	wrtnode |\
+        wms7620a-16128 |\
 	wt1520 |\
 	wt3020 |\
 	x5 |\

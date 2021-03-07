@@ -176,6 +176,7 @@ ramips_setup_interfaces()
 	hg255d | \
 	rt-n14u | \
 	wrtnode | \
+        wms7620a-16128 | \
 	wt3020 | \
 	ur-326n4g | \
 	zbt-wa05)

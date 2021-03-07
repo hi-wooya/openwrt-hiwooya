@@ -393,6 +393,9 @@ ramips_board_detect() {
 		;;
 	*"WRTNODE")
 		name="wrtnode"
+                ;;
+        *"WMS7620A-16128")
+                name="wms7620a-16128"
 		;;
 	*"Wansview NCS601W")
 		name="ncs601w"
