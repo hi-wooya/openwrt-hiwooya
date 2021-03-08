@@ -1,9 +1,9 @@
 /dts-v1/;
 
-/include/ "mt7620n.dtsi"
+/include/ "mt7620a.dtsi"
 
 / {
-	compatible = "hi-wooya", "ralink,mt7620n-soc";
+	compatible = "hi-wooya", "ralink,mt7620a-soc";
 	model = "WMS7620A-16128";
 
 	palmbus@10000000 {
@@ -60,6 +60,16 @@
 		status = "okay";
 	};
 
+        sdhci@10130000 {
+                compatible = "ralink,mt7620-sdhci";
+                reg = <0x10130000 4000>;
+
+                interrupt-parent = <&intc>;
+                interrupts = <14>;
+
+                status = "okay";
+        };
+
 	ethernet@10100000 {
 		mtd-mac-address = <&factory 0x4>;
 		ralink,port-map = "wllll";
@@ -72,7 +82,7 @@
 	pinctrl {
 		state_default: pinctrl0 {
 			default {
-				ralink,group = "ephy", "wled", "pa", "i2c", "wdt", "uartf";
+				ralink,group = "pa", "i2c", "wdt", "uartf";
 				ralink,function = "gpio";
 			};
 		};
