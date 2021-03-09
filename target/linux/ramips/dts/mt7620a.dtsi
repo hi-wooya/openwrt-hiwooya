@@ -10,7 +10,7 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyS0,57600";
+		bootargs = "console=ttyS1,57600";
 	};
 
 	cpuintc: cpuintc@0 {
@@ -89,7 +89,9 @@
 
 			reg-shift = <2>;
 
-			status = "disabled";
+			status = "okay";
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&uartf_gpio_pins>;
 		};
 
 		gpio0: gpio@600 {

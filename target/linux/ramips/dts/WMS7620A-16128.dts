@@ -98,7 +98,7 @@
 	pinctrl {
 		state_default: pinctrl0 {
 			gpio {
-				ralink,group = "wdio", "pa", "i2c", "wdt";
+				ralink,group = "mdio", "pa", "i2c", "wdt";
 				ralink,function = "gpio";
 			};
                         wled {
