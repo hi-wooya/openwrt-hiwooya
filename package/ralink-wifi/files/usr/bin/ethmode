@@ -1,0 +1,27 @@
+#!/bin/sh
+
+case $1 in
+wllll | 1)
+        echo "mode WLLLL"
+        uci set network.lan.ifname=eth0.1
+        uci set network.@switch[0].enable_vlan=1
+        uci set network.wan.ifname=eth0.2
+        uci set network.wan6.ifname=eth0.2
+        uci commit
+	echo 1 | dd bs=1 seek=1000 count=1 of=/dev/mtdblock1 2>/dev/null
+        /etc/init.d/network restart      
+        ;;
+lllll | 2)
+        echo "mode LLLLL"
+        uci set network.lan.ifname=eth0
+        uci set network.@switch[0].enable_vlan=0
+        uci set network.wan.ifname=
+        uci set network.wan6.ifname=
+        uci commit
+	echo 2 | dd bs=1 seek=1000 count=1 of=/dev/mtdblock1 2>/dev/null
+        /etc/init.d/network restart      
+        ;;
+*)
+	echo "ethmode w/l/wllll/lllll"
+	;;
+esac
