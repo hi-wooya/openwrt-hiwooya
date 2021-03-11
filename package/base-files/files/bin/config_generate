@@ -17,6 +17,11 @@ set network.loopback.netmask='255.0.0.0'
 delete network.globals
 set network.globals='globals'
 set network.globals.ula_prefix='auto'
+delete network.4g
+set network.4g='interface'
+set network.4g.proto='dhcp'
+set network.4g.ifname='eth1'
+set network.4g.dns='114.114.114.114'
 EOF
 }
 

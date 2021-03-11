@@ -19,7 +19,7 @@ define Profile/WMS7620A-16128
                 kmod-nls-base kmod-nls-cp437 kmod-nls-iso8859-1 kmod-nls-utf8 \
                 kmod-sdhci-mt7620 kmod-usb-storage \
                 kmod-video-core kmod-video-uvc \
-                ralink-wifi luci
+                ralink-wifi luci quectel
 endef
 
 define Profile/WMS7620A-16128/Description

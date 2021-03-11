@@ -1,0 +1,114 @@
+diff -Naur a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+--- a/drivers/net/usb/qmi_wwan.c	2020-09-10 15:25:54.739162606 +0800
++++ b/drivers/net/usb/qmi_wwan.c	2020-09-10 15:39:54.129744535 +0800
+@@ -818,8 +818,10 @@
+ 	{QMI_GOBI_DEVICE(0x05c6, 0x9225)},	/* Sony Gobi 2000 Modem device (N0279, VU730) */
+ 	{QMI_GOBI_DEVICE(0x05c6, 0x9245)},	/* Samsung Gobi 2000 Modem device (VL176) */
+ 	{QMI_GOBI_DEVICE(0x03f0, 0x251d)},	/* HP Gobi 2000 Modem device (VP412) */
+-	{QMI_GOBI_DEVICE(0x05c6, 0x9215)},	/* Acer Gobi 2000 Modem device (VP413) */
+-	{QMI_GOBI_DEVICE(0x05c6, 0x9265)},	/* Asus Gobi 2000 Modem device (VR305) */
++#if 0 //delete by wooya
++    {QMI_GOBI_DEVICE(0x05c6, 0x9215)},	/* Acer Gobi 2000 Modem device (VP413) */
++#endif
++    {QMI_GOBI_DEVICE(0x05c6, 0x9265)},	/* Asus Gobi 2000 Modem device (VR305) */
+ 	{QMI_GOBI_DEVICE(0x05c6, 0x9235)},	/* Top Global Gobi 2000 Modem device (VR306) */
+ 	{QMI_GOBI_DEVICE(0x05c6, 0x9275)},	/* iRex Technologies Gobi 2000 Modem device (VR307) */
+ 	{QMI_GOBI_DEVICE(0x0af0, 0x8120)},	/* Option GTM681W */
+diff -Naur a/drivers/usb/serial/option.c b/drivers/usb/serial/option.c
+--- a/drivers/usb/serial/option.c	2020-09-10 15:26:15.851629972 +0800
++++ b/drivers/usb/serial/option.c	2020-09-10 17:15:47.064261062 +0800
+@@ -1133,7 +1133,20 @@
+ 	{ USB_DEVICE_INTERFACE_CLASS(BANDRICH_VENDOR_ID, BANDRICH_PRODUCT_1010, 0xff) },
+ 	{ USB_DEVICE_INTERFACE_CLASS(BANDRICH_VENDOR_ID, BANDRICH_PRODUCT_1011, 0xff) },
+ 	{ USB_DEVICE_INTERFACE_CLASS(BANDRICH_VENDOR_ID, BANDRICH_PRODUCT_1012, 0xff) },
+-	{ USB_DEVICE(KYOCERA_VENDOR_ID, KYOCERA_PRODUCT_KPC650) },
++#if 1 //Added by wooya
++	//ec20 old
++    { USB_DEVICE_INTERFACE_NUMBER(0x05C6, 0x9215, 0) },
++    { USB_DEVICE_INTERFACE_NUMBER(0x05C6, 0x9215, 1) },
++    { USB_DEVICE_INTERFACE_NUMBER(0x05C6, 0x9215, 2) },
++    { USB_DEVICE_INTERFACE_NUMBER(0x05C6, 0x9215, 3) },
++	
++    //ec20 new
++    { USB_DEVICE_INTERFACE_NUMBER(0x2C7C, 0x0125, 0) },
++	{ USB_DEVICE_INTERFACE_NUMBER(0x2C7C, 0x0125, 1) },
++	{ USB_DEVICE_INTERFACE_NUMBER(0x2C7C, 0x0125, 2) },
++	{ USB_DEVICE_INTERFACE_NUMBER(0x2C7C, 0x0125, 3) },
++#endif
++    { USB_DEVICE(KYOCERA_VENDOR_ID, KYOCERA_PRODUCT_KPC650) },
+ 	{ USB_DEVICE(KYOCERA_VENDOR_ID, KYOCERA_PRODUCT_KPC680) },
+ 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x6000)}, /* ZTE AC8700 */
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUALCOMM_VENDOR_ID, 0x6001, 0xff, 0xff, 0xff), /* 4G LTE usb-modem U901 */
+@@ -1866,6 +1879,11 @@
+ #ifdef CONFIG_PM
+ 	.suspend           = usb_wwan_suspend,
+ 	.resume            = usb_wwan_resume,
++
++#if 1 //Added by wooya
++.reset_resume = usb_wwan_resume,
++#endif
++
+ #endif
+ };
+ 
+@@ -1933,6 +1951,22 @@
+ 	    iface_desc->bInterfaceClass != USB_CLASS_CDC_DATA)
+ 		return -ENODEV;
+ 
++#if 1 //Added by wooya
++//Quectel UC20'sinterface 4 can be used as USB Network device
++if(serial->dev->descriptor.idVendor == cpu_to_le16(0x05C6) &&
++serial->dev->descriptor.idProduct == cpu_to_le16(0x9003) &&
++serial->interface->cur_altsetting->desc.bInterfaceNumber >= 4)
++  return -ENODEV;
++//Quectel EC20's interface4 can be used as USB Network device
++if(serial->dev->descriptor.idVendor == cpu_to_le16(0x05C6) &&
++serial->dev->descriptor.idProduct == cpu_to_le16(0x9215) &&
++serial->interface->cur_altsetting->desc.bInterfaceNumber >= 4)
++return -ENODEV;
++//QuectelEC21&EC25&EC20 R2.0's interface 4 can be used as USB Network device
++if(serial->dev->descriptor.idVendor == cpu_to_le16(0x2C7C)
++&&serial->interface->cur_altsetting->desc.bInterfaceNumber >= 4)
++return -ENODEV;
++#endif
+ 	/* Store device id so we can use it during attach. */
+ 	usb_set_serial_data(serial, (void *)id);
+ 
+diff -Naur a/drivers/usb/serial/qcserial.c b/drivers/usb/serial/qcserial.c
+--- a/drivers/usb/serial/qcserial.c	2020-09-10 15:36:27.105161553 +0800
++++ b/drivers/usb/serial/qcserial.c	2020-09-10 15:37:13.694192911 +0800
+@@ -90,7 +90,9 @@
+ 	{USB_DEVICE(0x03f0, 0x241d)},	/* HP Gobi 2000 QDL device (VP412) */
+ 	{USB_DEVICE(0x03f0, 0x251d)},	/* HP Gobi 2000 Modem device (VP412) */
+ 	{USB_DEVICE(0x05c6, 0x9214)},	/* Acer Gobi 2000 QDL device (VP413) */
+-	{USB_DEVICE(0x05c6, 0x9215)},	/* Acer Gobi 2000 Modem device (VP413) */
++#if 0 //delete by wooya
++    {USB_DEVICE(0x05c6, 0x9215)},	/* Acer Gobi 2000 Modem device (VP413) */
++#endif
+ 	{USB_DEVICE(0x05c6, 0x9264)},	/* Asus Gobi 2000 QDL device (VR305) */
+ 	{USB_DEVICE(0x05c6, 0x9265)},	/* Asus Gobi 2000 Modem device (VR305) */
+ 	{USB_DEVICE(0x05c6, 0x9234)},	/* Top Global Gobi 2000 QDL device (VR306) */
+diff -Naur a/drivers/usb/serial/usb_wwan.c b/drivers/usb/serial/usb_wwan.c
+--- a/drivers/usb/serial/usb_wwan.c	2020-09-10 15:26:38.180124274 +0800
++++ b/drivers/usb/serial/usb_wwan.c	2020-09-10 15:35:23.035743215 +0800
+@@ -471,6 +471,20 @@
+ 			  usb_sndbulkpipe(serial->dev, endpoint) | dir,
+ 			  buf, len, callback, ctx);
+ 
++#if 1 //Added by wooya for Zero Packet
++	if (dir == USB_DIR_OUT) {
++		struct usb_device_descriptor*desc = &serial->dev->descriptor;
++		if (desc->idVendor ==cpu_to_le16(0x05C6) && desc->idProduct == cpu_to_le16(0x9090))
++			urb->transfer_flags|= URB_ZERO_PACKET;
++		if (desc->idVendor ==cpu_to_le16(0x05C6) && desc->idProduct == cpu_to_le16(0x9003))
++			urb->transfer_flags|= URB_ZERO_PACKET;
++		if (desc->idVendor ==cpu_to_le16(0x05C6) && desc->idProduct == cpu_to_le16(0x9215))
++			urb->transfer_flags|= URB_ZERO_PACKET;
++		if (desc->idVendor ==cpu_to_le16(0x2C7C))
++			urb->transfer_flags|= URB_ZERO_PACKET;
++		}
++#endif
++
+ 	return urb;
+ }
+ 

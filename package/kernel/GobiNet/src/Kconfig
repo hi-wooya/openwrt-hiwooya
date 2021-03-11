@@ -1,0 +1,7 @@
+config USB_GOBI_NET
+	tristate "Gobi USB Net driver for Quectel module"
+	help
+	  Support Quectel module.
+
+	  A modemmanager with support for GobiNet is recommended.
+	  To compile this driver as a module, chose M here;the module will be calledGobiNet.
